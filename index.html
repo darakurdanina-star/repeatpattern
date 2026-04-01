@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Повтори узор</title>
+
+<style>
+body {
+    margin: 0;
+    font-family: 'Comic Sans MS', sans-serif;
+    text-align: center;
+    background: #ffeef5;
+}
+
+.screen { display: none; }
+.active { display: block; }
+
+#gameContainer {
+    position: relative;
+    width: 90%;
+    max-width: 400px;
+    margin: 0 auto;
+}
+
+#background {
+    width: 100%;
+    height: 500px;
+    background: url('png/background.png') center/cover no-repeat;
+    border-radius: 20px;
+    position: relative;
+}
+
+#nastya {
+    width: 120px;
+    position: absolute;
+    top: 10px;
+    left: 10px;
+}
+
+#speechBox {
+    position: absolute;
+    top: 150px;
+    left: 10px;
+    width: calc(100% - 40px);
+    min-height: 60px;
+    background: #fff8c4;
+    border-radius: 12px;
+    padding: 10px;
+    font-size: 18px;
+    color: #333;
+    box-shadow: 2px 2px 5px rgba(0,0,0,0.2);
+}
+
+.btn {
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 460px;
+    cursor: pointer;
+}
+
+.slot {
+    width: 70px;
+    height: 70px;
+    border: 3px dashed #aaa;
+    border-radius: 15px;
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    margin: 8px;
+}
+
+.item-bottom {
+    width: 70px;
+    margin: 10px;
+    cursor: grab;
+}
+
+.win {
+    animation: pop 0.4s infinite alternate;
+}
+
+@keyframes pop {
+    from { transform: scale(1); }
+    to { transform: scale(1.1); }
+}
+</style>
+</head>
+
+<body>
+
+<div id="screen1" class="screen active">
+    <div id="gameContainer">
+        <div id="background">
+            <img id="nastya" src="png/nastya.png">
+            <div id="speechBox"></div>
+            <img class="btn" src="png/button1.png" onclick="startGame()">
+        </div>
+    </div>
+</div>
+
+<div id="screen2" class="screen">
+    <div id="gameContainer">
+        <div id="background">
+            <img id="nastya" src="png/nastya.png">
+            <div id="speechBox"></div>
+            <div id="gameArea" style="position:absolute;bottom:20px;width:100%;padding-top:180px;"></div>
+        </div>
+    </div>
+</div>
+
+<div id="screen3" class="screen">
+    <div id="gameContainer">
+        <div id="background">
+            <img id="nastya" src="png/nastya.png">
+            <div id="speechBox"></div>
+            <div id="gameArea2" style="position:absolute;bottom:20px;width:100%;padding-top:180px;"></div>
+        </div>
+    </div>
+</div>
+
+<audio id="sound1" src="sounds/sound1.mp3"></audio>
+<audio id="sound2" src="sounds/sound2.mp3"></audio>
+<audio id="sound3" src="sounds/sound3.mp3"></audio>
+<audio id="sound4" src="sounds/sound4.mp3"></audio>
+<audio id="sound5" src="sounds/sound5.mp3"></audio>
+<audio id="sound6" src="sounds/sound6.mp3"></audio>
+<audio id="sound7" src="sounds/sound7.mp3"></audio>
+<audio id="sound8" src="sounds/sound8.mp3"></audio>
+<audio id="sound9" src="sounds/sound9.mp3"></audio>
+
+<script>
+const correctOrder = [
+    "png/rose.png",
+    "png/sun.png",
+    "png/bear_full.png",
+    "png/raspberry.png"
+];
+
+let userOrder = [null, null, null, null];
+let currentSound = null;
+let selected = null;
+const correctBear = "png/bear_red_bow.png";
+
+function getSpeechBox(){
+    return document.querySelector('.screen.active #speechBox');
+}
+
+function playSound(id, callback=null) {
+    if (currentSound) {
+        currentSound.pause();
+        currentSound.currentTime = 0;
+    }
+    currentSound = document.getElementById(id);
+    currentSound.onended = null;
+    currentSound.play().catch(()=>{});
+    if(callback){
+        currentSound.onended = callback;
+    }
+}
+
+function startGame(){
+    switchScreen(2);
+    const speech = getSpeechBox();
+    speech.innerText = "Я нарисовала очень красивый рисунок, сможешь повторить?";
+    playSound("sound1", showPattern);
+}
+
+function switchScreen(n){
+    document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+    document.getElementById('screen'+n).classList.add('active');
+}
+
+function showPattern(){
+    const area = document.getElementById('gameArea');
+    area.innerHTML = "";
+    getSpeechBox().innerText = "А теперь запоминай мой рисунок, у тебя 10 секунд.";
+
+    correctOrder.forEach(src=>{
+        const img = document.createElement('img');
+        img.src = src;
+        img.className="item-bottom";
+        area.appendChild(img);
+    });
+
+    playSound("sound2");
+    setTimeout(startGamePhase,10000);
+}
+
+function startGamePhase(){
+    const area = document.getElementById('gameArea');
+    area.innerHTML="";
+    userOrder=[null,null,null,null];
+
+    const slotsWrap=document.createElement('div');
+    area.appendChild(slotsWrap);
+
+    for(let i=0;i<4;i++){
+        const slot=document.createElement('div');
+        slot.className="slot";
+        slot.dataset.index=i;
+        slotsWrap.appendChild(slot);
+    }
+
+    const shuffled=[...correctOrder].sort(()=>Math.random()-0.5);
+    const container=document.createElement('div');
+    shuffled.forEach(src=>{
+        const img = document.createElement('img');
+        img.src = src;
+        img.className="item-bottom";
+        enableDrag(img);
+        container.appendChild(img);
+    });
+
+    area.appendChild(container);
+    getSpeechBox().innerText="Попробуй нарисовать также как я.";
+    playSound("sound3");
+}
+
+function enableDrag(el){
+    el.draggable = true;
+    el.ondragstart = ()=>{ selected = el; };
+    document.querySelectorAll('.slot').forEach(slot=>{
+        slot.ondragover = (e)=> e.preventDefault();
+        slot.ondrop = (e)=>{
+            e.preventDefault();
+            if(!selected) return;
+            const index = slot.dataset.index;
+            if(slot.children.length > 0) return;
+            const clone = selected.cloneNode();
+            clone.style.width="100%";
+            clone.style.height="100%";
+            clone.style.objectFit="contain";
+            slot.appendChild(clone);
+            userOrder[index]=selected.src;
+            selected.remove();
+            selected=null;
+            checkResult();
+        };
+    });
+}
+
+function checkResult(){
+    if(userOrder.includes(null)) return;
+    let correct=true;
+    for(let i=0;i<4;i++){
+        if(!userOrder[i].includes(correctOrder[i])) correct=false;
+    }
+    if(correct){
+        getSpeechBox().innerText = "Молодец! А теперь нарисуй свой рисунок на бумаге!";
+        playSound("sound4");
+        document.querySelectorAll('.slot').forEach(s=>s.classList.add("win"));
+
+        const btn = document.createElement('img');
+        btn.src = 'png/button2.png';
+        btn.className = 'btn';
+        btn.onclick = startSecondStage;
+        document.getElementById('gameArea').appendChild(btn);
+    }else{
+        getSpeechBox().innerText = "Попробуй еще раз, запоминай внимательнее!";
+        playSound("sound5", showPattern);
+    }
+}
+
+function startSecondStage(){
+    switchScreen(3);
+    const speech = getSpeechBox();
+    speech.innerText = "";
+    const area = document.getElementById('gameArea2');
+    area.innerHTML = "";
+
+    playSound("sound6");
+    getSpeechBox().innerText = "Так, теперь другая суть игры, давай запоминай мой рисунок, и через 10 секунд выбери такой же!";
+
+    const bear = document.createElement('img');
+    bear.src = correctBear;
+    bear.style.width = "120px";
+    area.appendChild(bear);
+
+    setTimeout(()=>{
+        getSpeechBox().innerText = "Время подошло к концу! Перетащи рисунок который у меня был.";
+        showBearChoices();
+    }, 15000);
+}
+
+function showBearChoices(){
+    const area = document.getElementById('gameArea2');
+    area.innerHTML = "";
+
+    const bears = [
+        "png/bear_red_bow.png",
+        "png/bear_blue_cap.png",
+        "png/bear_with_candy.png"
+    ].sort(()=>Math.random()-0.5);
+
+    const slot = document.createElement('div');
+    slot.className = 'slot';
+    area.appendChild(slot);
+
+    const container = document.createElement('div');
+    bears.forEach(src=>{
+        const img = document.createElement('img');
+        img.src = src;
+        img.className="item-bottom";
+        enableDragSecond(img, slot);
+        container.appendChild(img);
+    });
+
+    area.appendChild(container);
+
+    playSound("sound7");
+}
+
+function enableDragSecond(el, slot){
+    el.draggable = true;
+    el.ondragstart = ()=>{ selected = el; };
+    slot.ondragover = (e)=> e.preventDefault();
+    slot.ondrop = (e)=>{
+        e.preventDefault();
+        if(!selected) return;
+        if(slot.children.length>0) return;
+        const clone = selected.cloneNode();
+        clone.style.width="100%";
+        clone.style.height="100%";
+        clone.style.objectFit="contain";
+        slot.appendChild(clone);
+
+        if(selected.src.includes(correctBear)){
+            playSound("sound8");
+            getSpeechBox().innerText = "Молодец, ты справился с заданием!";
+        }else{
+            playSound("sound9", startSecondStage);
+            getSpeechBox().innerText = "К сожалению это не правильный ответ, я покажу своего Мишку еще раз, давай по новой!";
+        }
+        selected=null;
+    };
+}
+</script>
+
+</body>
+</html>
