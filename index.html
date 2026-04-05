@@ -151,27 +151,47 @@ function playSound(id, callback=null){ if(currentSound){ currentSound.pause(); c
 function switchScreen(n){ document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active')); document.getElementById('screen'+n).classList.add('active'); }
 
 function startGame(){ switchScreen(2); getSpeechBox().innerText="Я нарисовала очень красивый рисунок, сможешь повторить?"; playSound("sound1", showPattern); }
-function showPattern(){ const area=document.getElementById('gameArea'); area.innerHTML=""; getSpeechBox().innerText="А теперь запоминай мой рисунок, у тебя 10 секунд."; correctOrder.forEach(src=>{ const img=document.createElement('img'); img.src=src; img.className='item-bottom'; area.appendChild(img); }); playSound("sound2"); setTimeout(startGamePhase,10000); }
+
+function showPattern(){
+    const area=document.getElementById('gameArea'); area.innerHTML="";
+    getSpeechBox().innerText="А теперь запоминай мой рисунок, у тебя 10 секунд.";
+    correctOrder.forEach(src=>{
+        const img=document.createElement('img');
+        img.src=src;
+        img.className='item-bottom';
+        area.appendChild(img);
+    });
+    playSound("sound2");
+    setTimeout(startGamePhase,10000);
+}
+
 function startGamePhase(){
     const area=document.getElementById('gameArea'); area.innerHTML=""; userOrder=[null,null,null,null];
     const slotsWrap=document.createElement('div'); area.appendChild(slotsWrap);
     for(let i=0;i<4;i++){ const slot=document.createElement('div'); slot.className='slot'; slot.dataset.index=i; slotsWrap.appendChild(slot); }
     const shuffled=[...correctOrder].sort(()=>Math.random()-0.5);
     const container=document.createElement('div');
-    shuffled.forEach(src=>{ const img=document.createElement('img'); img.src=src; img.className='item-bottom'; makeDraggable(img); container.appendChild(img); });
+    shuffled.forEach(src=>{
+        const img=document.createElement('img');
+        img.src=src;
+        img.className='item-bottom';
+        img.dataset.placed="false";
+        makeDraggable(img);
+        container.appendChild(img);
+    });
     area.appendChild(container);
     getSpeechBox().innerText="Попробуй нарисовать также как я."; playSound("sound3");
 }
 
 function isMobile(){ return /Android|iPhone|iPad|iPod/i.test(navigator.userAgent); }
 
-// универсальная функция drag & drop для ПК и мобильных
 function makeDraggable(el){
     el.draggable = !isMobile();
     if(!isMobile()){ el.ondragstart=()=>selected=el; }
     else{
         el.addEventListener('touchstart', e=>{
             e.preventDefault();
+            if(el.dataset.placed==="true") return; // нельзя брать элемент уже использованный
             selected = el;
             const rect = el.getBoundingClientRect();
             offsetX = e.touches[0].clientX - rect.left;
@@ -203,6 +223,7 @@ function makeDraggable(el){
                         slot.appendChild(finalClone);
                         const idx = slot.dataset.index;
                         if(idx!==undefined) userOrder[idx]=selected.src;
+                        selected.dataset.placed="true"; // блокируем оригинал
                         placed=true;
                     }
                 }
@@ -240,15 +261,64 @@ function checkResult(){
 }
 
 /* Второй этап */
-function showSecondButton(){ const area=document.getElementById('gameArea2'); area.innerHTML=""; const btn=document.createElement('button'); btn.innerText="Продолжим"; btn.className='game-btn'; btn.onclick=()=>{ btn.remove(); showBearPreview(); }; area.appendChild(btn);}
-function showBearPreview(){ const area=document.getElementById('gameArea2'); area.innerHTML=""; const correct="png/bear_red_bow.png"; const bear=document.createElement('img'); bear.src=correct; bear.style.width='120px'; area.appendChild(bear); setTimeout(()=>{ playSound('sound7'); showBearChoices(); },10000);}
-function showBearChoices(){
-    const area=document.getElementById('gameArea2'); area.innerHTML=""; const correct="png/bear_red_bow.png"; const slot=document.createElement('div'); slot.className='slot'; area.appendChild(slot);
-    const bears=[correct,"png/bear_blue_cap.png","png/bear_with_candy.png"].sort(()=>Math.random()-0.5);
-    const container=document.createElement('div'); bears.forEach(src=>{ const img=document.createElement('img'); img.src=src; img.className='item-bottom'; makeDraggableSecond(img,slot,correct); container.appendChild(img); }); area.appendChild(container);
+function showSecondButton(){
+    const area=document.getElementById('gameArea2'); area.innerHTML="";
+    const btn=document.createElement('button'); btn.innerText="Продолжим"; btn.className='game-btn';
+    btn.onclick=()=>{ btn.remove(); showBearPreview(); };
+    area.appendChild(btn);
 }
-function makeDraggableSecond(el,slot,correct){ el.draggable=!isMobile(); if(!isMobile()){ el.ondragstart=()=>selected=el; } slot.ondragover=(e)=>e.preventDefault(); slot.ondrop=()=>handleSecondDrop(slot,correct); if(isMobile()){ el.addEventListener('touchstart',startDrag); el.addEventListener('touchmove',drag); el.addEventListener('touchend',()=>handleSecondDrop(slot,correct)); } }
-function handleSecondDrop(slot,correct){ if(!selected || slot.children.length) return; const clone=selected.cloneNode(); clone.style.width='auto'; clone.style.height='100%'; clone.style.maxWidth='100%'; clone.style.objectFit='contain'; slot.appendChild(clone); if(selected.src.includes(correct)){ playSound('sound9'); getSpeechBox().innerText="Молодец! Ты узнал все мои рисунки! А теперь нарисуй свою любимую игрушку на бумаге и покажи родителям!"; } else{ playSound('sound8'); getSpeechBox().innerText="К сожалению, это неправильный ответ. Я покажу тебе свой рисунок снова"; setTimeout(showBearPreview,2000);} selected=null; }
+
+function showBearPreview(){
+    const area=document.getElementById('gameArea2'); area.innerHTML="";
+    const correct="png/bear_red_bow.png";
+    const bear=document.createElement('img'); bear.src=correct; bear.style.width='120px'; area.appendChild(bear);
+    setTimeout(()=>{ playSound('sound7'); showBearChoices(); },10000);
+}
+
+function showBearChoices(){
+    const area=document.getElementById('gameArea2'); area.innerHTML="";
+    const correct="png/bear_red_bow.png";
+    const slot=document.createElement('div'); slot.className='slot'; area.appendChild(slot);
+
+    const bears=[correct,"png/bear_blue_cap.png","png/bear_with_candy.png"].sort(()=>Math.random()-0.5);
+    const container=document.createElement('div');
+    bears.forEach(src=>{
+        const img=document.createElement('img'); img.src=src; img.className='item-bottom'; img.dataset.placed="false";
+        makeDraggableSecond(img,slot,correct);
+        container.appendChild(img);
+    });
+    area.appendChild(container);
+}
+
+function makeDraggableSecond(el,slot,correct){
+    el.draggable=!isMobile();
+    if(!isMobile()){ el.ondragstart=()=>selected=el; }
+    slot.ondragover=(e)=>e.preventDefault(); slot.ondrop=()=>handleSecondDrop(slot,correct);
+    if(isMobile()){
+        el.addEventListener('touchstart', e=>{
+            if(el.dataset.placed==="true") return;
+            selected=el; const rect=el.getBoundingClientRect(); offsetX=e.touches[0].clientX-rect.left; offsetY=e.touches[0].clientY-rect.top;
+            clone=el.cloneNode(true); clone.style.position="absolute"; clone.style.zIndex=1000; clone.style.width=rect.width+"px"; clone.style.height=rect.height+"px"; clone.style.pointerEvents="none"; document.body.appendChild(clone);
+        });
+        el.addEventListener('touchmove', e=>{ if(!clone) return; e.preventDefault(); clone.style.left=(e.touches[0].clientX-offsetX)+"px"; clone.style.top=(e.touches[0].clientY-offsetY)+"px"; });
+        el.addEventListener('touchend', ()=>{ if(!clone) return; handleSecondDrop(slot,correct,true); });
+    }
+}
+
+function handleSecondDrop(slot,correct,isMobileDrop=false){
+    if(!selected || slot.children.length) return;
+    const cloneEl = selected.cloneNode();
+    cloneEl.style.width='auto'; cloneEl.style.height='100%'; cloneEl.style.maxWidth='100%'; cloneEl.style.objectFit='contain';
+    slot.appendChild(cloneEl);
+    if(selected.src.includes(correct)){
+        selected.dataset.placed="true";
+        playSound('sound9'); getSpeechBox().innerText="Молодец! Ты узнал все мои рисунки! А теперь нарисуй свою любимую игрушку на бумаге и покажи родителям!";
+    } else{
+        playSound('sound8'); getSpeechBox().innerText="К сожалению, это неправильный ответ. Я покажу тебе свой рисунок снова";
+        setTimeout(showBearPreview,2000);
+    }
+    if(isMobileDrop) clone.remove(); clone=null; selected=null;
+}
 </script>
 
 </body>
