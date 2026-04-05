@@ -89,6 +89,7 @@ body {
     max-width: 80px;
     margin: 6px;
     touch-action: none;
+    object-fit: contain;
 }
 .highlight {
     outline: 3px solid #ff69b4;
@@ -99,11 +100,13 @@ body {
 
 <body>
 
+<!-- СТАРТ -->
 <div id="screen1" class="screen active">
     <div id="gameContainer">
         <div id="background">
             <img id="nastya" src="png/nastya.png">
             <div id="speechBox"></div>
+
             <button class="game-btn" onclick="startGame()">Начать</button>
         </div>
     </div>
@@ -129,6 +132,7 @@ body {
     </div>
 </div>
 
+<!-- звуки -->
 <audio id="sound1" src="sounds/sound1.mp3"></audio>
 <audio id="sound2" src="sounds/sound2.mp3"></audio>
 <audio id="sound3" src="sounds/sound3.mp3"></audio>
@@ -139,185 +143,287 @@ body {
 <audio id="sound9" src="sounds/sound9.mp3"></audio>
 
 <script>
-const correctOrder = ["png/rose.png","png/sun.png","png/bear_full.png","png/raspberry.png"];
+const correctOrder = [
+    "png/rose.png",
+    "png/sun.png",
+    "png/bear_full.png",
+    "png/raspberry.png"
+];
+
 let userOrder = [null,null,null,null];
 let selected = null;
 let currentSound = null;
-let clone = null;
-let offsetX = 0, offsetY = 0;
+let offsetX=0, offsetY=0, clone=null;
 
 function getSpeechBox(){ return document.querySelector('.screen.active #speechBox'); }
-function playSound(id, callback=null){ if(currentSound){ currentSound.pause(); currentSound.currentTime=0; } currentSound=document.getElementById(id); currentSound.play().catch(()=>{}); if(callback) currentSound.onended=callback; }
-function switchScreen(n){ document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active')); document.getElementById('screen'+n).classList.add('active'); }
 
-function startGame(){ switchScreen(2); getSpeechBox().innerText="Я нарисовала очень красивый рисунок, сможешь повторить?"; playSound("sound1", showPattern); }
+function playSound(id, callback=null){
+    if(currentSound){ currentSound.pause(); currentSound.currentTime=0; }
+    currentSound=document.getElementById(id);
+    currentSound.play().catch(()=>{});
+    if(callback) currentSound.onended=callback;
+}
+
+function switchScreen(n){
+    document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+    document.getElementById('screen'+n).classList.add('active');
+}
+
+function isMobile(){ return /Android|iPhone|iPad|iPod/i.test(navigator.userAgent); }
+
+/* === ПЕРВЫЙ ЭТАП === */
+function startGame(){
+    switchScreen(2);
+    getSpeechBox().innerText="Я нарисовала очень красивый рисунок, сможешь повторить?";
+    playSound("sound1", showPattern);
+}
 
 function showPattern(){
-    const area=document.getElementById('gameArea'); area.innerHTML="";
+    const area = document.getElementById('gameArea');
+    area.innerHTML="";
     getSpeechBox().innerText="А теперь запоминай мой рисунок, у тебя 10 секунд.";
+
     correctOrder.forEach(src=>{
         const img=document.createElement('img');
         img.src=src;
-        img.className='item-bottom';
+        img.className="item-bottom";
         area.appendChild(img);
     });
+
     playSound("sound2");
     setTimeout(startGamePhase,10000);
 }
 
 function startGamePhase(){
-    const area=document.getElementById('gameArea'); area.innerHTML=""; userOrder=[null,null,null,null];
-    const slotsWrap=document.createElement('div'); area.appendChild(slotsWrap);
-    for(let i=0;i<4;i++){ const slot=document.createElement('div'); slot.className='slot'; slot.dataset.index=i; slotsWrap.appendChild(slot); }
+    const area = document.getElementById('gameArea');
+    area.innerHTML="";
+    userOrder=[null,null,null,null];
+
+    const slotsWrap=document.createElement('div');
+    area.appendChild(slotsWrap);
+
+    for(let i=0;i<4;i++){
+        const slot=document.createElement('div');
+        slot.className="slot";
+        slot.dataset.index=i;
+        slotsWrap.appendChild(slot);
+    }
+
     const shuffled=[...correctOrder].sort(()=>Math.random()-0.5);
     const container=document.createElement('div');
+
     shuffled.forEach(src=>{
         const img=document.createElement('img');
         img.src=src;
-        img.className='item-bottom';
-        img.dataset.placed="false";
-        makeDraggable(img);
+        img.className="item-bottom";
+        img.dataset.placed="false"; // чтобы нельзя было вставить дважды
         container.appendChild(img);
+        makeDraggable(img);
     });
+
     area.appendChild(container);
-    getSpeechBox().innerText="Попробуй нарисовать также как я."; playSound("sound3");
+    getSpeechBox().innerText="Попробуй нарисовать также как я.";
+    playSound("sound3");
 }
 
-function isMobile(){ return /Android|iPhone|iPad|iPod/i.test(navigator.userAgent); }
-
+/* === DRAG & DROP === */
 function makeDraggable(el){
     el.draggable = !isMobile();
-    if(!isMobile()){ el.ondragstart=()=>selected=el; }
-    else{
-        el.addEventListener('touchstart', e=>{
-            e.preventDefault();
-            if(el.dataset.placed==="true") return; // нельзя брать элемент уже использованный
-            selected = el;
-            const rect = el.getBoundingClientRect();
-            offsetX = e.touches[0].clientX - rect.left;
-            offsetY = e.touches[0].clientY - rect.top;
-            clone = el.cloneNode(true);
-            clone.style.position="absolute"; clone.style.zIndex=1000;
-            clone.style.width = rect.width+"px"; clone.style.height = rect.height+"px";
-            clone.style.pointerEvents="none";
-            document.body.appendChild(clone);
-        });
-        el.addEventListener('touchmove', e=>{
-            if(!clone) return;
-            e.preventDefault();
-            clone.style.left = (e.touches[0].clientX - offsetX) + "px";
-            clone.style.top = (e.touches[0].clientY - offsetY) + "px";
-        });
-        el.addEventListener('touchend', e=>{
-            if(!clone) return;
-            let placed = false;
-            document.querySelectorAll('.slot').forEach(slot=>{
-                const r = slot.getBoundingClientRect();
-                const s = clone.getBoundingClientRect();
-                if(!(s.right<r.left||s.left>r.right||s.bottom<r.top||s.top>r.bottom)){
-                    if(!slot.children.length){
-                        const finalClone = selected.cloneNode();
-                        finalClone.style.width="auto"; finalClone.style.height="100%";
-                        finalClone.style.maxWidth="100%";
-                        finalClone.style.objectFit="contain";
-                        slot.appendChild(finalClone);
-                        const idx = slot.dataset.index;
-                        if(idx!==undefined) userOrder[idx]=selected.src;
-                        selected.dataset.placed="true"; // блокируем оригинал
-                        placed=true;
-                    }
-                }
-            });
-            clone.remove(); clone=null; if(placed) selected=null; checkResult();
-        });
-    }
+    if(!isMobile()) el.ondragstart = ()=> selected=el;
 
     document.querySelectorAll('.slot').forEach(slot=>{
-        slot.ondragover=(e)=>e.preventDefault();
-        slot.ondrop=(e)=>{
+        slot.ondragover = e=> e.preventDefault();
+        slot.ondrop = e=>{
             e.preventDefault();
-            if(!selected || slot.children.length) return;
-            const finalClone = selected.cloneNode();
-            finalClone.style.width="100%"; finalClone.style.height="100%";
-            slot.appendChild(finalClone);
+            if(!selected || slot.children.length || selected.dataset.placed=="true") return;
+            const cloneEl = selected.cloneNode();
+            cloneEl.style.width="100%";
+            cloneEl.style.height="100%";
+            slot.appendChild(cloneEl);
             userOrder[slot.dataset.index]=selected.src;
-            if(!isMobile()) selected.remove(); selected=null;
+            selected.dataset.placed="true";
+            if(!isMobile()) selected.remove();
+            selected=null;
             checkResult();
-        }
+        };
     });
+
+    if(isMobile()){
+        el.addEventListener('touchstart', startDrag);
+        el.addEventListener('touchmove', drag);
+        el.addEventListener('touchend', dropMobile);
+    }
 }
 
+function startDrag(e){
+    e.preventDefault();
+    selected = e.target;
+    if(selected.dataset.placed=="true") return;
+
+    const rect = selected.getBoundingClientRect();
+    offsetX = e.touches[0].clientX - rect.left;
+    offsetY = e.touches[0].clientY - rect.top;
+
+    clone = selected.cloneNode(true);
+    clone.style.position="absolute";
+    clone.style.zIndex=1000;
+    clone.style.width = rect.width+"px";
+    clone.style.height = rect.height+"px";
+    clone.style.pointerEvents="none";
+    document.body.appendChild(clone);
+}
+
+function drag(e){
+    if(!clone) return;
+    e.preventDefault();
+    clone.style.left = (e.touches[0].clientX - offsetX) + "px";
+    clone.style.top = (e.touches[0].clientY - offsetY) + "px";
+}
+
+function dropMobile(){
+    if(!clone) return;
+    document.querySelectorAll('.slot').forEach(slot=>{
+        const r = slot.getBoundingClientRect();
+        const s = clone.getBoundingClientRect();
+        if(!(s.right<r.left || s.left>r.right || s.bottom<r.top || s.top>r.bottom)){
+            if(!slot.children.length){
+                const finalClone = selected.cloneNode();
+                finalClone.style.width="100%";
+                finalClone.style.height="100%";
+                slot.appendChild(finalClone);
+                userOrder[slot.dataset.index]=selected.src;
+                selected.dataset.placed="true";
+            }
+        }
+    });
+    clone.remove(); clone=null; selected=null;
+    checkResult();
+}
+
+/* === ПРОВЕРКА === */
 function checkResult(){
     if(userOrder.includes(null)) return;
+
     let correct=true;
-    for(let i=0;i<4;i++){ if(!userOrder[i].includes(correctOrder[i])) correct=false; }
+    for(let i=0;i<4;i++) if(!userOrder[i].includes(correctOrder[i])) correct=false;
+
     if(correct){
         setTimeout(()=>{
             switchScreen(3);
             getSpeechBox().innerText="Ты молодец! Справишься с другим заданием? Запомни мой новый рисунок, а через 10 секунд - найди такой же!";
-            playSound("sound6"); showSecondButton();
+            playSound("sound6");
+            showSecondButton();
         },1500);
-    } else { getSpeechBox().innerText="Попробуй еще раз, запоминай внимательнее!"; playSound("sound5", showPattern); }
+    } else {
+        getSpeechBox().innerText="Попробуй еще раз, запоминай внимательнее!";
+        playSound("sound5", showPattern);
+    }
 }
 
-/* Второй этап */
+/* === ВТОРОЙ ЭТАП === */
 function showSecondButton(){
-    const area=document.getElementById('gameArea2'); area.innerHTML="";
-    const btn=document.createElement('button'); btn.innerText="Продолжим"; btn.className='game-btn';
+    const area = document.getElementById('gameArea2');
+    area.innerHTML="";
+
+    const btn=document.createElement('button');
+    btn.innerText="Продолжим";
+    btn.className="game-btn";
     btn.onclick=()=>{ btn.remove(); showBearPreview(); };
     area.appendChild(btn);
 }
 
 function showBearPreview(){
-    const area=document.getElementById('gameArea2'); area.innerHTML="";
+    const area = document.getElementById('gameArea2');
+    area.innerHTML="";
+
     const correct="png/bear_red_bow.png";
-    const bear=document.createElement('img'); bear.src=correct; bear.style.width='120px'; area.appendChild(bear);
-    setTimeout(()=>{ playSound('sound7'); showBearChoices(); },10000);
+
+    const bear = document.createElement('img');
+    bear.src=correct;
+    bear.style.width="120px";
+    area.appendChild(bear);
+
+    setTimeout(()=>{ playSound("sound7"); showBearChoices(); },10000);
 }
 
 function showBearChoices(){
-    const area=document.getElementById('gameArea2'); area.innerHTML="";
+    const area=document.getElementById('gameArea2');
+    area.innerHTML="";
+
     const correct="png/bear_red_bow.png";
-    const slot=document.createElement('div'); slot.className='slot'; area.appendChild(slot);
+    const slot=document.createElement('div');
+    slot.className='slot';
+    area.appendChild(slot);
 
     const bears=[correct,"png/bear_blue_cap.png","png/bear_with_candy.png"].sort(()=>Math.random()-0.5);
     const container=document.createElement('div');
+    container.style.display='flex';
+    container.style.justifyContent='center';
+    container.style.flexWrap='wrap';
+    container.style.marginTop='10px';
+
     bears.forEach(src=>{
-        const img=document.createElement('img'); img.src=src; img.className='item-bottom'; img.dataset.placed="false";
-        makeDraggableSecond(img,slot,correct);
+        const img=document.createElement('img');
+        img.src=src;
+        img.className='item-bottom';
+        img.dataset.placed="false";
         container.appendChild(img);
+        makeDraggableSecond(img, slot, correct);
     });
+
     area.appendChild(container);
 }
 
-function makeDraggableSecond(el,slot,correct){
+function makeDraggableSecond(el, slot, correct){
     el.draggable=!isMobile();
-    if(!isMobile()){ el.ondragstart=()=>selected=el; }
-    slot.ondragover=(e)=>e.preventDefault(); slot.ondrop=()=>handleSecondDrop(slot,correct);
+    if(!isMobile()) el.ondragstart=()=> selected=el;
+
+    slot.ondragover=e=> e.preventDefault();
+    slot.ondrop=()=> handleSecondDrop(slot, correct);
+
     if(isMobile()){
         el.addEventListener('touchstart', e=>{
-            if(el.dataset.placed==="true") return;
-            selected=el; const rect=el.getBoundingClientRect(); offsetX=e.touches[0].clientX-rect.left; offsetY=e.touches[0].clientY-rect.top;
-            clone=el.cloneNode(true); clone.style.position="absolute"; clone.style.zIndex=1000; clone.style.width=rect.width+"px"; clone.style.height=rect.height+"px"; clone.style.pointerEvents="none"; document.body.appendChild(clone);
+            if(el.dataset.placed=="true") return;
+            selected=el;
+            const rect=el.getBoundingClientRect();
+            offsetX=e.touches[0].clientX - rect.left;
+            offsetY=e.touches[0].clientY - rect.top;
+
+            clone=el.cloneNode(true);
+            clone.style.position='absolute';
+            clone.style.zIndex=1000;
+            clone.style.width=rect.width+'px';
+            clone.style.height=rect.height+'px';
+            clone.style.pointerEvents='none';
+            document.body.appendChild(clone);
         });
-        el.addEventListener('touchmove', e=>{ if(!clone) return; e.preventDefault(); clone.style.left=(e.touches[0].clientX-offsetX)+"px"; clone.style.top=(e.touches[0].clientY-offsetY)+"px"; });
-        el.addEventListener('touchend', ()=>{ if(!clone) return; handleSecondDrop(slot,correct,true); });
+        el.addEventListener('touchmove', drag);
+        el.addEventListener('touchend', ()=> handleSecondDrop(slot, correct, true));
     }
 }
 
-function handleSecondDrop(slot,correct,isMobileDrop=false){
+function handleSecondDrop(slot, correct, isMobileDrop=false){
     if(!selected || slot.children.length) return;
-    const cloneEl = selected.cloneNode();
-    cloneEl.style.width='auto'; cloneEl.style.height='100%'; cloneEl.style.maxWidth='100%'; cloneEl.style.objectFit='contain';
+
+    const cloneEl=selected.cloneNode();
+    cloneEl.style.width='auto';
+    cloneEl.style.height='100%';
+    cloneEl.style.maxWidth='100%';
+    cloneEl.style.objectFit='contain';
     slot.appendChild(cloneEl);
+
     if(selected.src.includes(correct)){
         selected.dataset.placed="true";
-        playSound('sound9'); getSpeechBox().innerText="Молодец! Ты узнал все мои рисунки! А теперь нарисуй свою любимую игрушку на бумаге и покажи родителям!";
-    } else{
-        playSound('sound8'); getSpeechBox().innerText="К сожалению, это неправильный ответ. Я покажу тебе свой рисунок снова";
+        playSound('sound9');
+        getSpeechBox().innerText="Молодец! Ты узнал все мои рисунки! А теперь нарисуй свою любимую игрушку на бумаге и покажи родителям!";
+    } else {
+        playSound('sound8');
+        getSpeechBox().innerText="К сожалению, это неправильный ответ. Я покажу тебе свой рисунок снова";
         setTimeout(showBearPreview,2000);
     }
-    if(isMobileDrop) clone.remove(); clone=null; selected=null;
+
+    if(isMobileDrop && clone){ clone.remove(); clone=null; }
+    selected=null;
 }
 </script>
 
