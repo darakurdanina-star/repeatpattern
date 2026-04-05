@@ -90,6 +90,10 @@ body {
     margin: 6px;
     touch-action: none;
 }
+.highlight {
+    outline: 3px solid #ff69b4;
+    border-radius: 10px;
+}
 </style>
 </head>
 
@@ -227,8 +231,16 @@ function startGamePhase(){
     playSound("sound3");
 }
 
+/* === DRAG & DROP === */
+
+let offsetX=0, offsetY=0, clone=null;
+
+function isMobile(){
+    return /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+}
+
 function makeDraggable(el){
-    el.draggable = true;
+    el.draggable = !isMobile(); // ПК drag оставляем
     el.ondragstart = ()=> selected = el;
 
     document.querySelectorAll('.slot').forEach(slot=>{
@@ -236,66 +248,73 @@ function makeDraggable(el){
         slot.ondrop = (e)=>{
             e.preventDefault();
             if(!selected || slot.children.length) return;
-
-            const clone = selected.cloneNode();
-            clone.style.width="100%";
-            clone.style.height="100%";
-
-            slot.appendChild(clone);
+            const cloneEl = selected.cloneNode();
+            cloneEl.style.width="100%";
+            cloneEl.style.height="100%";
+            slot.appendChild(cloneEl);
             userOrder[slot.dataset.index]=selected.src;
-
-            selected.remove();
+            if(!isMobile()) selected.remove();
             selected=null;
-
             checkResult();
         };
     });
 
-    el.addEventListener('touchstart', startDrag);
-    el.addEventListener('touchmove', drag);
-    el.addEventListener('touchend', drop);
+    if(isMobile()){
+        el.addEventListener('touchstart', startDrag);
+        el.addEventListener('touchmove', drag);
+        el.addEventListener('touchend', drop);
+    }
 }
 
-let offsetX=0, offsetY=0;
-
 function startDrag(e){
+    e.preventDefault();
     selected = e.target;
     const rect = selected.getBoundingClientRect();
     offsetX = e.touches[0].clientX - rect.left;
     offsetY = e.touches[0].clientY - rect.top;
 
-    selected.style.position="absolute";
-    selected.style.zIndex=1000;
+    clone = selected.cloneNode(true);
+    clone.style.position="absolute";
+    clone.style.zIndex=1000;
+    clone.style.width = rect.width + "px";
+    clone.style.height = rect.height + "px";
+    clone.style.pointerEvents = "none";
+    document.body.appendChild(clone);
 }
 
 function drag(e){
-    if(!selected) return;
-    selected.style.left = (e.touches[0].clientX - offsetX) + "px";
-    selected.style.top = (e.touches[0].clientY - offsetY) + "px";
+    if(!clone) return;
+    e.preventDefault();
+    clone.style.left = (e.touches[0].clientX - offsetX) + "px";
+    clone.style.top = (e.touches[0].clientY - offsetY) + "px";
 }
 
 function drop(){
-    if(!selected) return;
+    if(!clone) return;
 
     document.querySelectorAll('.slot').forEach(slot=>{
         const r = slot.getBoundingClientRect();
-        const s = selected.getBoundingClientRect();
+        const s = clone.getBoundingClientRect();
 
         if(!(s.right < r.left || s.left > r.right || s.bottom < r.top || s.top > r.bottom)){
             if(!slot.children.length){
-                const clone = selected.cloneNode();
-                clone.style.width="100%";
-                clone.style.height="100%";
-                slot.appendChild(clone);
-                userOrder[slot.dataset.index]=selected.src;
-                selected.remove();
+                const finalClone = selected.cloneNode();
+                finalClone.style.width="100%";
+                finalClone.style.height="100%";
+                slot.appendChild(finalClone);
+                const idx = slot.dataset.index;
+                if(idx !== undefined) userOrder[idx] = selected.src;
             }
         }
     });
 
+    clone.remove();
+    clone=null;
     selected=null;
     checkResult();
 }
+
+/* === ПРОВЕРКА === */
 
 function checkResult(){
     if(userOrder.includes(null)) return;
@@ -333,10 +352,7 @@ function showSecondButton(){
     btn.innerText = "Продолжим";
     btn.className = "game-btn";
 
-    btn.onclick = ()=>{
-        btn.remove();
-        showBearPreview();
-    };
+    btn.onclick = ()=>{ btn.remove(); showBearPreview(); };
 
     area.appendChild(btn);
 }
@@ -352,10 +368,7 @@ function showBearPreview(){
     bear.style.width = "120px";
     area.appendChild(bear);
 
-    setTimeout(()=>{
-        playSound("sound7");
-        showBearChoices();
-    },10000);
+    setTimeout(()=>{ playSound("sound7"); showBearChoices(); },10000);
 }
 
 function showBearChoices(){
@@ -388,18 +401,17 @@ function showBearChoices(){
 }
 
 function makeDraggableSecond(el, slot, correct){
-    el.draggable = true;
+    el.draggable = !isMobile();
     el.ondragstart = ()=> selected = el;
 
     slot.ondragover = (e)=> e.preventDefault();
-    slot.ondrop = (e)=>{
-        e.preventDefault();
-        handleSecondDrop(slot, correct);
-    };
+    slot.ondrop = (e)=>{ handleSecondDrop(slot, correct); };
 
-    el.addEventListener('touchstart', startDrag);
-    el.addEventListener('touchmove', drag);
-    el.addEventListener('touchend', ()=> handleSecondDrop(slot, correct));
+    if(isMobile()){
+        el.addEventListener('touchstart', startDrag);
+        el.addEventListener('touchmove', drag);
+        el.addEventListener('touchend', ()=> handleSecondDrop(slot, correct));
+    }
 }
 
 function handleSecondDrop(slot, correct){
