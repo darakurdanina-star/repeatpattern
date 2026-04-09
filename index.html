@@ -1,406 +1,406 @@
-    <!DOCTYPE html>
-    <html lang="ru">
-    <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Повтори узор</title>
-    <style>
-    body {
-        margin: 0;
-        font-family: 'Comic Sans MS', sans-serif;
-        text-align: center;
-        background: #ffeef5;
-    }
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Повтори узор</title>
+<style>
+body {
+    margin: 0;
+    font-family: 'Comic Sans MS', sans-serif;
+    text-align: center;
+    background: #ffeef5;
+}
 
-    .screen { display: none; }
-    .active { display: block; }
+.screen { display: none; }
+.active { display: block; }
 
-    #gameContainer {
-        width: 90%;
-        max-width: 420px;
-        margin: 0 auto;
-    }
+#gameContainer {
+    width: 90%;
+    max-width: 420px;
+    margin: 0 auto;
+}
 
-    #background {
-        width: 100%;
-        aspect-ratio: 3/4;
-        background: url('png/background.png') center/cover no-repeat;
-        border-radius: 20px;
-        position: relative;
-    }
+#background {
+    width: 100%;
+    aspect-ratio: 3/4;
+    background: url('png/background.png') center/cover no-repeat;
+    border-radius: 20px;
+    position: relative;
+}
 
-    #nastya {
-        width: 17%;
-        position: absolute;
-        top: 10px;
-        left: 50%;
-        transform: translateX(-50%);
-        opacity: 1;
-    }
+#nastya {
+    width: 17%;
+    position: absolute;
+    top: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    opacity: 1;
+}
 
-    #speechBox {
-        display: block;
-        position: absolute;
-        top: 25%;
-        left: 50%;
-        transform: translateX(-50%);
-        width: auto;
-        max-width: 80%;
-        background: #fff8c4;
-        padding: 10px 15px;
-        border-radius: 12px;
-        font-size: 16px;
-        box-sizing: border-box;
-    }
+#speechBox {
+    display: block;
+    position: absolute;
+    top: 25%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: auto;
+    max-width: 80%;
+    background: #fff8c4;
+    padding: 10px 15px;
+    border-radius: 12px;
+    font-size: 16px;
+    box-sizing: border-box;
+}
 
-    .game-btn {
-        position: absolute;
-        bottom: 15px;
-        left: 50%;
-        transform: translateX(-50%);
-        padding: 10px 20px;
-        font-size: 16px;
-        background: #ff69b4;
-        color: white;
-        border: none;
-        border-radius: 12px;
-        width: 60%;
-        max-width: 220px;
-    }
+.game-btn {
+    position: absolute;
+    bottom: 15px;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 10px 20px;
+    font-size: 16px;
+    background: #ff69b4;
+    color: white;
+    border: none;
+    border-radius: 12px;
+    width: 60%;
+    max-width: 220px;
+}
 
-    #gameArea, #gameArea2 {
-        position: absolute;
-        bottom: 10px;
-        width: 100%;
-    }
+#gameArea, #gameArea2 {
+    position: absolute;
+    bottom: 10px;
+    width: 100%;
+}
 
-    .slot {
-        width: 18vw;
-        height: 18vw;
-        max-width: 70px;
-        max-height: 70px;
-        border: 3px dashed #aaa;
-        border-radius: 15px;
-        display: inline-flex;
-        justify-content: center;
-        align-items: center;
-        margin: 6px;
-    }
+.slot {
+    width: 18vw;
+    height: 18vw;
+    max-width: 70px;
+    max-height: 70px;
+    border: 3px dashed #aaa;
+    border-radius: 15px;
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    margin: 6px;
+}
 
-    .item-bottom {
-        width: 20vw;
-        max-width: 80px;
-        margin: 6px;
-        touch-action: none;
-        object-fit: contain;
-    }
+.item-bottom {
+    width: 20vw;
+    max-width: 80px;
+    margin: 6px;
+    touch-action: none;
+    object-fit: contain;
+}
 
-    .highlight {
-        outline: 3px solid #ff69b4;
-        border-radius: 10px;
-    }
-    </style>
-    </head>
-    <body>
+.highlight {
+    outline: 3px solid #ff69b4;
+    border-radius: 10px;
+}
+</style>
+</head>
+<body>
 
-    <div id="screen1" class="screen active">
-        <div id="gameContainer">
-            <div id="background">
-                <img id="nastya" src="png/nastya.png">
-                <div id="speechBox"></div>
-                <button class="game-btn" onclick="startGame()">Начать</button>
+<div id="screen1" class="screen active">
+    <div id="gameContainer">
+        <div id="background">
+            <img id="nastya" src="png/nastya.png">
+            <div id="speechBox"></div>
+            <button class="game-btn" onclick="startGame()">Начать</button>
+        </div>
+    </div>
+</div>
+
+<div id="screen2" class="screen">
+    <div id="gameContainer">
+        <div id="background">
+            <img id="nastya" src="png/nastya.png">
+            <div id="speechBox"></div>
+            <div id="gameArea"></div>
+        </div>
+    </div>
+</div>
+
+<div id="screen3" class="screen">
+    <div id="gameContainer">
+        <div id="background">
+            <img id="nastya" src="png/nastya.png">
+            <div id="speechBox"></div>
+            <div id="gameArea2"></div>
+        </div>
+    </div>
+</div>
+
+<div id="screen4" class="screen">
+    <div id="gameContainer">
+        <div id="background">
+            <img src="png/nastya.png" style="width:17%; position:absolute; top:10px; left:50%; transform:translateX(-50%);">
+            <div style="
+                position:absolute;
+                top:35%;
+                left:50%;
+                transform:translateX(-50%);
+                width:80%;
+                background:#fff8c4;
+                padding:15px;
+                border-radius:12px;
+                font-size:18px;
+            ">
+                🎉 Ты молодец!<br><br>
+                А теперь нарисуй свой рисунок и покажи родителям!
             </div>
         </div>
     </div>
+</div>
 
-    <div id="screen2" class="screen">
-        <div id="gameContainer">
-            <div id="background">
-                <img id="nastya" src="png/nastya.png">
-                <div id="speechBox"></div>
-                <div id="gameArea"></div>
-            </div>
-        </div>
-    </div>
+<audio id="sound1" src="sounds/sound1.mp3"></audio>
+<audio id="sound2" src="sounds/sound2.mp3"></audio>
+<audio id="sound3" src="sounds/sound3.mp3"></audio>
+<audio id="sound5" src="sounds/sound5.mp3"></audio>
+<audio id="sound6" src="sounds/sound6.mp3"></audio>
+<audio id="sound7" src="sounds/sound7.mp3"></audio>
+<audio id="sound8" src="sounds/sound8.mp3"></audio>
+<audio id="sound9" src="sounds/sound9.mp3"></audio>
 
-    <div id="screen3" class="screen">
-        <div id="gameContainer">
-            <div id="background">
-                <img id="nastya" src="png/nastya.png">
-                <div id="speechBox"></div>
-                <div id="gameArea2"></div>
-            </div>
-        </div>
-    </div>
+<script>
+const correctOrder = ["png/rose.png","png/sun.png","png/bear_full.png","png/raspberry.png"];
+let userOrder = [null,null,null,null];
+let selected = null, currentSound = null, offsetX=0, offsetY=0, clone=null;
 
-    <div id="screen4" class="screen">
-        <div id="gameContainer">
-            <div id="background">
-                <img src="png/nastya.png" style="width:17%; position:absolute; top:10px; left:50%; transform:translateX(-50%);">
-                <div style="
-                    position:absolute;
-                    top:35%;
-                    left:50%;
-                    transform:translateX(-50%);
-                    width:80%;
-                    background:#fff8c4;
-                    padding:15px;
-                    border-radius:12px;
-                    font-size:18px;
-                ">
-                    🎉 Ты молодец!<br><br>
-                    А теперь нарисуй свой рисунок и покажи родителям!
-                </div>
-            </div>
-        </div>
-    </div>
+let secondStageCompleted = false;
+let allowSelection = false;
 
-    <audio id="sound1" src="sounds/sound1.mp3"></audio>
-    <audio id="sound2" src="sounds/sound2.mp3"></audio>
-    <audio id="sound3" src="sounds/sound3.mp3"></audio>
-    <audio id="sound5" src="sounds/sound5.mp3"></audio>
-    <audio id="sound6" src="sounds/sound6.mp3"></audio>
-    <audio id="sound7" src="sounds/sound7.mp3"></audio>
-    <audio id="sound8" src="sounds/sound8.mp3"></audio>
-    <audio id="sound9" src="sounds/sound9.mp3"></audio>
+function getSpeechBox(){ return document.querySelector('.screen.active #speechBox'); }
+function playSound(id, callback=null){
+    if(currentSound){ currentSound.pause(); currentSound.currentTime=0; }
+    currentSound=document.getElementById(id);
+    currentSound.play().catch(()=>{});
+    if(callback) currentSound.onended=callback;
+}
+function switchScreen(n){
+    document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+    document.getElementById('screen'+n).classList.add('active');
+}
+function isMobile(){ return /Android|iPhone|iPad|iPod/i.test(navigator.userAgent); }
 
-    <script>
-    const correctOrder = ["png/rose.png","png/sun.png","png/bear_full.png","png/raspberry.png"];
-    let userOrder = [null,null,null,null];
-    let selected = null, currentSound = null, offsetX=0, offsetY=0, clone=null;
+function startGame(){
+    switchScreen(2);
+    getSpeechBox().innerText="Я нарисовала очень красивый рисунок, сможешь повторить?";
+    playSound("sound1", showPattern);
+}
 
-    function getSpeechBox(){ return document.querySelector('.screen.active #speechBox'); }
-    function playSound(id, callback=null){
-        if(currentSound){ currentSound.pause(); currentSound.currentTime=0; }
-        currentSound=document.getElementById(id);
-        currentSound.play().catch(()=>{});
-        if(callback) currentSound.onended=callback;
-    }
-    function switchScreen(n){
-        document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
-        document.getElementById('screen'+n).classList.add('active');
-    }
-    function isMobile(){ return /Android|iPhone|iPad|iPod/i.test(navigator.userAgent); }
+function showPattern(){
+    const area = document.getElementById('gameArea');
+    area.innerHTML="";
+    getSpeechBox().innerText="Запоминай мой рисунок, у тебя 10 секунд.";
 
-    function startGame(){
-        switchScreen(2);
-        getSpeechBox().innerText="Я нарисовала очень красивый рисунок, сможешь повторить?";
-        playSound("sound1", showPattern);
-    }
+    correctOrder.forEach(src=>{
+        const img=document.createElement('img');
+        img.src=src;
+        img.className="item-bottom";
+        area.appendChild(img);
+    });
 
-    function showPattern(){
-        const area = document.getElementById('gameArea');
-        area.innerHTML="";
-        getSpeechBox().innerText="Запоминай мой рисунок, у тебя 10 секунд.";
+    playSound("sound2");
+    setTimeout(startGamePhase,10000);
+}
 
-        correctOrder.forEach(src=>{
-            const img=document.createElement('img');
-            img.src=src;
-            img.className="item-bottom";
-            area.appendChild(img);
-        });
+function startGamePhase(){
+    const area = document.getElementById('gameArea');
+    area.innerHTML="";
+    userOrder=[null,null,null,null];
 
-        playSound("sound2");
-        setTimeout(startGamePhase,10000);
-    }
+    const slotsWrap=document.createElement('div');
+    area.appendChild(slotsWrap);
 
-    function startGamePhase(){
-        const area = document.getElementById('gameArea');
-        area.innerHTML="";
-        userOrder=[null,null,null,null];
-
-        const slotsWrap=document.createElement('div');
-        area.appendChild(slotsWrap);
-
-        for(let i=0;i<4;i++){
-            const slot=document.createElement('div');
-            slot.className="slot";
-            slot.dataset.index=i;
-            slotsWrap.appendChild(slot);
-        }
-
-        const shuffled=[...correctOrder].sort(()=>Math.random()-0.5);
-        const container=document.createElement('div');
-
-        shuffled.forEach(src=>{
-            const img=document.createElement('img');
-            img.src=src;
-            img.className="item-bottom";
-            img.dataset.placed="false";
-            container.appendChild(img);
-            makeDraggable(img);
-        });
-
-        area.appendChild(container);
-        getSpeechBox().innerText="Попробуй нарисовать также как я.";
-        playSound("sound3");
-    }
-
-    function makeDraggable(el){
-        el.draggable = !isMobile();
-        if(!isMobile()) el.ondragstart = ()=> selected=el;
-
-        document.querySelectorAll('.slot').forEach(slot=>{
-            slot.ondragover = e=> e.preventDefault();
-            slot.ondrop = e=>{
-                e.preventDefault();
-                if(!selected || slot.children.length || selected.dataset.placed=="true") return;
-                const cloneEl = selected.cloneNode();
-                cloneEl.style.width="100%";
-                cloneEl.style.height="100%";
-                slot.appendChild(cloneEl);
-                userOrder[slot.dataset.index]=selected.src;
-                selected.dataset.placed="true";
-                if(!isMobile()) selected.remove();
-                selected=null;
-                checkResult();
-            };
-        });
-
-        if(isMobile()){
-            el.addEventListener('touchstart', startDrag);
-            el.addEventListener('touchmove', drag);
-            el.addEventListener('touchend', dropMobile);
-        }
-    }
-
-    function startDrag(e){
-        e.preventDefault();
-        selected = e.target;
-        if(selected.dataset.placed=="true") return;
-
-        const rect = selected.getBoundingClientRect();
-        offsetX = e.touches[0].clientX - rect.left;
-        offsetY = e.touches[0].clientY - rect.top;
-
-        clone = selected.cloneNode(true);
-        clone.style.position="absolute";
-        clone.style.zIndex=1000;
-        clone.style.width = rect.width+"px";
-        clone.style.height = rect.height+"px";
-        clone.style.pointerEvents="none";
-        document.body.appendChild(clone);
-    }
-
-    function drag(e){
-        if(!clone) return;
-        e.preventDefault();
-        clone.style.left = (e.touches[0].clientX - offsetX) + "px";
-        clone.style.top = (e.touches[0].clientY - offsetY) + "px";
-    }
-
-    function dropMobile(){
-        if(!clone) return;
-        document.querySelectorAll('.slot').forEach(slot=>{
-            const r = slot.getBoundingClientRect();
-            const s = clone.getBoundingClientRect();
-            if(!(s.right<r.left || s.left>r.right || s.bottom<r.top || s.top>r.bottom)){
-                if(!slot.children.length){
-                    const finalClone = selected.cloneNode();
-                    finalClone.style.width="100%";
-                    finalClone.style.height="100%";
-                    slot.appendChild(finalClone);
-                    userOrder[slot.dataset.index]=selected.src;
-                    selected.dataset.placed="true";
-                }
-            }
-        });
-        clone.remove(); clone=null; selected=null;
-        checkResult();
-    }
-
-    function checkResult(){
-        if(userOrder.includes(null)) return;
-
-        let correct=true;
-        for(let i=0;i<4;i++) if(!userOrder[i].includes(correctOrder[i])) correct=false;
-
-        if(correct){
-            setTimeout(()=>{
-                switchScreen(3);
-                playSound("sound6");
-                showBearPreview();
-            },1500);
-        } else {
-            playSound("sound5", showPattern);
-        }
-    }
-
-    function showBearPreview(){
-        const area = document.getElementById('gameArea2');
-        area.innerHTML="";
-        getSpeechBox().innerText="Теперь запомни этот рисунок и найди такой же!";
-
-        const bear = document.createElement('img');
-        bear.src="png/bear_red_bow.png";
-        bear.style.width="120px";
-        bear.style.display="block";
-        bear.style.margin="10px auto";
-        area.appendChild(bear);
-
-        setTimeout(spawnBearChoices,5000);
-    }
-
-    function spawnBearChoices(){
-        const area = document.getElementById('gameArea2');
-        area.innerHTML="";
-        getSpeechBox().innerText="Выбери правильного медведя:";
-
-        const correct="png/bear_red_bow.png";
-        const options=["png/bear_red_bow.png","png/bear_blue_cap.png","png/bear_with_candy.png"];
-        options.sort(()=>Math.random()-0.5);
-
-        const container=document.createElement('div');
-        container.style.display="flex";
-        container.style.justifyContent="center";
-        container.style.flexWrap="wrap";
-
-        options.forEach(src=>{
-            const img=document.createElement('img');
-            img.src=src;
-            img.className="item-bottom";
-            img.dataset.placed="false";
-            container.appendChild(img);
-            makeDraggable(img);
-        });
-
-        area.appendChild(container);
-
-        const slotsWrap=document.createElement('div');
-        slotsWrap.style.marginTop="10px";
-        area.appendChild(slotsWrap);
-
+    for(let i=0;i<4;i++){
         const slot=document.createElement('div');
         slot.className="slot";
+        slot.dataset.index=i;
         slotsWrap.appendChild(slot);
-
-        slot.ondragover = e=> e.preventDefault();
-        slot.ondrop = e=> handleSecondDrop(slot, correct);
     }
 
-    function handleSecondDrop(slot, correct){
-    if(secondStageCompleted) return;
-    if(!selected || slot.children.length) return;
+    const shuffled=[...correctOrder].sort(()=>Math.random()-0.5);
+    const container=document.createElement('div');
 
-    const cloneEl = selected.cloneNode();
+    shuffled.forEach(src=>{
+        const img=document.createElement('img');
+        img.src=src;
+        img.className="item-bottom";
+        img.dataset.placed="false";
+        container.appendChild(img);
+        makeDraggable(img);
+    });
+
+    area.appendChild(container);
+    getSpeechBox().innerText="Попробуй нарисовать также как я.";
+    playSound("sound3");
+}
+
+function makeDraggable(el){
+    el.draggable = !isMobile();
+    if(!isMobile()) el.ondragstart = ()=> selected=el;
+
+    document.querySelectorAll('.slot').forEach(slot=>{
+        slot.ondragover = e=> e.preventDefault();
+        slot.ondrop = e=>{
+            e.preventDefault();
+            if(!selected || slot.children.length || selected.dataset.placed=="true") return;
+            const cloneEl = selected.cloneNode();
+            cloneEl.style.width="100%";
+            cloneEl.style.height="100%";
+            slot.appendChild(cloneEl);
+            userOrder[slot.dataset.index]=selected.src;
+            selected.dataset.placed="true";
+            if(!isMobile()) selected.remove();
+            selected=null;
+            checkResult();
+        };
+    });
+
+    if(isMobile()){
+        el.addEventListener('touchstart', startDrag);
+        el.addEventListener('touchmove', drag);
+        el.addEventListener('touchend', dropMobile);
+    }
+}
+
+function startDrag(e){
+    e.preventDefault();
+    selected = e.target;
+    if(selected.dataset.placed=="true") return;
+
+    const rect = selected.getBoundingClientRect();
+    offsetX = e.touches[0].clientX - rect.left;
+    offsetY = e.touches[0].clientY - rect.top;
+
+    clone = selected.cloneNode(true);
+    clone.style.position="absolute";
+    clone.style.zIndex=1000;
+    clone.style.width = rect.width+"px";
+    clone.style.height = rect.height+"px";
+    clone.style.pointerEvents="none";
+    document.body.appendChild(clone);
+}
+
+function drag(e){
+    if(!clone) return;
+    e.preventDefault();
+    clone.style.left = (e.touches[0].clientX - offsetX) + "px";
+    clone.style.top = (e.touches[0].clientY - offsetY) + "px";
+}
+
+function dropMobile(){
+    if(!clone) return;
+    document.querySelectorAll('.slot').forEach(slot=>{
+        const r = slot.getBoundingClientRect();
+        const s = clone.getBoundingClientRect();
+        if(!(s.right<r.left || s.left>r.right || s.bottom<r.top || s.top>r.bottom)){
+            if(!slot.children.length){
+                const finalClone = selected.cloneNode();
+                finalClone.style.width="100%";
+                finalClone.style.height="100%";
+                slot.appendChild(finalClone);
+                userOrder[slot.dataset.index]=selected.src;
+                selected.dataset.placed="true";
+            }
+        }
+    });
+    clone.remove(); clone=null; selected=null;
+    checkResult();
+}
+
+function checkResult(){
+    if(userOrder.includes(null)) return;
+
+    let correct=true;
+    for(let i=0;i<4;i++) if(!userOrder[i].includes(correctOrder[i])) correct=false;
+
+    if(correct){
+        setTimeout(()=>{
+            switchScreen(3);
+            playSound("sound6");
+            showBearPreview();
+        },1500);
+    } else {
+        playSound("sound5", showPattern);
+    }
+}
+
+function showBearPreview(){
+    const area = document.getElementById('gameArea2');
+    area.innerHTML="";
+    getSpeechBox().innerText="Запомни правильного медведя!";
+    const bear = document.createElement('img');
+    bear.src="png/bear_red_bow.png";
+    bear.style.width="120px";
+    bear.style.display="block";
+    bear.style.margin="10px auto";
+    area.appendChild(bear);
+    allowSelection = false;
+    playSound("sound7");
+    setTimeout(spawnBearChoices, 5000);
+}
+
+function spawnBearChoices(){
+    const area = document.getElementById('gameArea2');
+    area.innerHTML = "";
+    getSpeechBox().innerText = "Выбери правильного медведя:";
+    const correct = "png/bear_red_bow.png";
+    const options = ["png/bear_red_bow.png","png/bear_blue_cap.png","png/bear_with_candy.png"];
+    options.sort(()=>Math.random()-0.5);
+
+    const container = document.createElement('div');
+    container.style.display = "flex";
+    container.style.justifyContent = "center";
+    container.style.flexWrap = "wrap";
+
+    options.forEach(src=>{
+        const img = document.createElement('img');
+        img.src = src;
+        img.className = "item-bottom";
+        img.dataset.correct = src === correct;
+        img.style.margin = "5px";
+        img.addEventListener(isMobile()?"touchend":"click", ()=>handleSecondSelection(img, correct));
+        container.appendChild(img);
+    });
+
+    area.appendChild(container);
+
+    if(!isMobile()){
+        const slotsWrap = document.createElement('div');
+        slotsWrap.style.marginTop = "10px";
+        area.appendChild(slotsWrap);
+        const slot = document.createElement('div');
+        slot.className = "slot";
+        slotsWrap.appendChild(slot);
+        slot.ondragover = e=>e.preventDefault();
+        slot.ondrop = e=>handleSecondSelection(selected, correct);
+    }
+    allowSelection = true;
+}
+
+function handleSecondSelection(img, correct){
+    if(secondStageCompleted || !allowSelection) return;
+    const slot = document.querySelector('.screen.active .slot') || img.parentNode;
+    const cloneEl = img.cloneNode();
     cloneEl.style.width = '100%';
     cloneEl.style.height = '100%';
     cloneEl.style.objectFit = 'contain';
     slot.appendChild(cloneEl);
 
-    if(selected.src.includes(correct)){
-        selected.dataset.placed = "true";
+    if(img.src.includes(correct)){
         secondStageCompleted = true;
         playSound('sound9');
-        setTimeout(()=>{ switchScreen(4); }, 1500);
+        setTimeout(()=>switchScreen(4), 1500);
     } else {
         playSound('sound8');
-        setTimeout(showBearPreview, 2000); 
+        allowSelection = false;
+        setTimeout(showBearPreview, 2000);
     }
-
-    selected = null;
-    if(clone){ clone.remove(); clone=null; } 
 }
-    </script>
-    </body>
-    </html>
+</script>
+</body>
+</html>
