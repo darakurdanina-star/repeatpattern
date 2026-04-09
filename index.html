@@ -387,7 +387,7 @@
     cloneEl.style.objectFit = 'contain';
     slot.appendChild(cloneEl);
 
-    if(selected.src.includes(correct)){
+    if(selected.src.endsWith(correct)){
         selected.dataset.placed = "true";
         playSound('sound9');
         setTimeout(()=>{ switchScreen(4); }, 1500);
