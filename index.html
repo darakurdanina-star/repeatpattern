@@ -341,7 +341,7 @@
     setTimeout(spawnBearChoices,5000);
 }
 
-    function spawnBearChoices(){
+function spawnBearChoices(){
     const area = document.getElementById('gameArea2');
     area.innerHTML="";
     getSpeechBox().innerText="Выбери правильного медведя:";
@@ -361,7 +361,34 @@
         img.className="item-bottom";
         img.dataset.placed="false";
         container.appendChild(img);
-        makeDraggable(img); // <-- используем обычное перетаскивание
+
+        if(isMobile()){
+            // обработка touch для мобильных
+            img.addEventListener('touchstart', e=>{
+                if(img.dataset.placed=="true") return;
+                selected = img;
+                const rect = img.getBoundingClientRect();
+                offsetX = e.touches[0].clientX - rect.left;
+                offsetY = e.touches[0].clientY - rect.top;
+                clone = img.cloneNode(true);
+                clone.style.position='absolute';
+                clone.style.zIndex=1000;
+                clone.style.width = rect.width+'px';
+                clone.style.height = rect.height+'px';
+                clone.style.pointerEvents='none';
+                document.body.appendChild(clone);
+            });
+
+            img.addEventListener('touchmove', drag);
+
+            img.addEventListener('touchend', ()=>{
+                handleSecondDrop(slot, correct); // проверка выбора
+                if(clone){ clone.remove(); clone=null; } 
+                selected = null;
+            });
+        } else {
+            makeDraggable(img); // для ПК обычное drag&drop
+        }
     });
 
     area.appendChild(container);
@@ -378,7 +405,7 @@
     slot.ondrop = e=> handleSecondDrop(slot, correct);
 }
 
-    function handleSecondDrop(slot, correct){
+function handleSecondDrop(slot, correct){
     if(!selected || slot.children.length) return;
 
     const cloneEl = selected.cloneNode();
