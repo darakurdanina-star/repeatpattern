@@ -379,24 +379,28 @@
     }
 
     function handleSecondDrop(slot, correct){
-        if(!selected || slot.children.length) return;
+    if(secondStageCompleted) return;
+    if(!selected || slot.children.length) return;
 
-        const cloneEl=selected.cloneNode();
-        cloneEl.style.width='100%';
-        cloneEl.style.height='100%';
-        cloneEl.style.objectFit='contain';
-        slot.appendChild(cloneEl);
+    const cloneEl = selected.cloneNode();
+    cloneEl.style.width = '100%';
+    cloneEl.style.height = '100%';
+    cloneEl.style.objectFit = 'contain';
+    slot.appendChild(cloneEl);
 
-        if(selected.src.includes(correct)){
-            selected.dataset.placed="true";
-            playSound('sound9');
-            setTimeout(()=>{ switchScreen(4); },1500);
-        } else {
-            playSound('sound8', showBearPreview);
-        }
-
-        selected=null;
+    if(selected.src.includes(correct)){
+        selected.dataset.placed = "true";
+        secondStageCompleted = true;
+        playSound('sound9');
+        setTimeout(()=>{ switchScreen(4); }, 1500);
+    } else {
+        playSound('sound8');
+        setTimeout(showBearPreview, 2000); 
     }
+
+    selected = null;
+    if(clone){ clone.remove(); clone=null; } 
+}
     </script>
     </body>
     </html>
