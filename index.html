@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Повтори узор</title>
-    <style>
+<style>
 body {
     margin: 0;
     font-family: 'Comic Sans MS', sans-serif;
@@ -29,26 +29,46 @@ body {
     position: relative;
 }
 
+/* Nastya */
 #nastya {
-    width: 17%;
+    width: clamp(50px, 12%, 80px);
     position: absolute;
     top: 10px;
     left: 50%;
     transform: translateX(-50%);
+    opacity: 1;
 }
 
+/* Speech box */
 #speechBox {
     position: absolute;
-    top: 25%;
+    top: 18%; /* выше → будет перекрывать Настю */
     left: 50%;
     transform: translateX(-50%);
-    max-width: 80%;
+
+    width: 70%;
+    max-width: 280px;
+
     background: #fff8c4;
-    padding: 10px 15px;
-    border-radius: 12px;
-    font-size: 16px;
+
+    /* меньше размер = компактнее */
+    padding: 4px 8px;
+
+    border-radius: 14px;
+
+    /* ВАЖНО: уменьшаем текст */
+    font-size: clamp(9px, 2vw, 13px);
+    line-height: 1.15;
+
+    box-sizing: border-box;
+
+    /* более "игровой" стиль */
+    box-shadow: 0 6px 14px rgba(0,0,0,0.15);
+
+    z-index: 5;
 }
 
+/* кнопка */
 .game-btn {
     position: absolute;
     bottom: 15px;
@@ -64,103 +84,40 @@ body {
     max-width: 220px;
 }
 
+/* игровые зоны */
 #gameArea, #gameArea2 {
     position: absolute;
     bottom: 10px;
-    left: 0;
     width: 100%;
+    padding: 0 5px;
+    box-sizing: border-box;
 }
 
+/* слоты */
 .slot {
-    width: 18vw;
-    height: 18vw;
-    max-width: 70px;
-    max-height: 70px;
+    width: clamp(45px, 14vw, 65px);
+    height: clamp(45px, 14vw, 65px);
     border: 3px dashed #aaa;
     border-radius: 15px;
     display: inline-flex;
     justify-content: center;
     align-items: center;
-    margin: 6px;
+    margin: 4px;
 }
 
+/* предметы */
 .item-bottom {
-    width: 20vw;
-    max-width: 80px;
-    margin: 6px;
+    width: clamp(50px, 16vw, 75px);
+    height: auto;
+    margin: 4px;
     touch-action: none;
     object-fit: contain;
 }
 
-/* ===== МОБИЛКА ===== */
-@media (max-width: 480px) {
-
-    #background {
-        position: relative;
-        aspect-ratio: auto;
-        min-height: 75vh;
-        padding-top: 60px;
-    }
-
-    #nastya {
-        width: 22%;
-        top: 8px;
-        z-index: 2;
-    }
-
-    #speechBox {
-        position: relative;
-        margin: 12px auto;
-        width: 90%;
-        min-height: 60px;
-        padding: 12px;
-        font-size: 15px;
-        line-height: 1.3;
-        z-index: 1;
-    }
-
-    /* ВАЖНО — игра всегда снизу */
-    #gameArea, #gameArea2 {
-        position: absolute;
-        bottom: 10px;
-        left: 0;
-        width: 100%;
-    }
-
-    .slot {
-        width: 16vw;
-        height: 16vw;
-    }
-
-    .item-bottom {
-        width: 18vw;
-    }
-
-    /* экран 4 фикс */
-    #screen4 img {
-        width: 22% !important;
-        top: 5px !important;
-    }
-
-    #screen4 div {
-        position: relative !important;
-        top: auto !important;
-        left: auto !important;
-        transform: none !important;
-        margin: 10px auto;
-        width: 90% !important;
-        font-size: 16px !important;
-    }
-}
-
-/* мелкие улучшения */
-#speechBox {
-    max-height: 30%;
-    overflow-y: auto;
-}
-
-#nastya {
-    width: clamp(60px, 17%, 90px);
+/* выделение */
+.highlight {
+    outline: 3px solid #ff69b4;
+    border-radius: 10px;
 }
 </style>
     </head>
