@@ -5,101 +5,101 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Повтори узор</title>
     <style>
-    body {
-        margin: 0;
-        font-family: 'Comic Sans MS', sans-serif;
-        text-align: center;
-        background: #ffeef5;
-    }
+body {
+    margin: 0;
+    font-family: 'Comic Sans MS', sans-serif;
+    text-align: center;
+    background: #ffeef5;
+}
 
-    .screen { display: none; }
-    .active { display: block; }
+.screen { display: none; }
+.active { display: block; }
 
-    #gameContainer {
-        width: 90%;
-        max-width: 420px;
-        margin: 0 auto;
-    }
+#gameContainer {
+    width: 90%;
+    max-width: 420px;
+    margin: 0 auto;
+}
+
+#background {
+    width: 100%;
+    aspect-ratio: 3/4;
+    background: url('png/background.png') center/cover no-repeat;
+    border-radius: 20px;
+    position: relative;
+}
+
+#nastya {
+    width: 17%;
+    position: absolute;
+    top: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+#speechBox {
+    position: absolute;
+    top: 25%;
+    left: 50%;
+    transform: translateX(-50%);
+    max-width: 80%;
+    background: #fff8c4;
+    padding: 10px 15px;
+    border-radius: 12px;
+    font-size: 16px;
+}
+
+.game-btn {
+    position: absolute;
+    bottom: 15px;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 10px 20px;
+    font-size: 16px;
+    background: #ff69b4;
+    color: white;
+    border: none;
+    border-radius: 12px;
+    width: 60%;
+    max-width: 220px;
+}
+
+#gameArea, #gameArea2 {
+    position: absolute;
+    bottom: 10px;
+    width: 100%;
+}
+
+.slot {
+    width: 18vw;
+    height: 18vw;
+    max-width: 70px;
+    max-height: 70px;
+    border: 3px dashed #aaa;
+    border-radius: 15px;
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    margin: 6px;
+}
+
+.item-bottom {
+    width: 20vw;
+    max-width: 80px;
+    margin: 6px;
+    touch-action: none;
+    object-fit: contain;
+}
+
+/* ===== МОБИЛКА ===== */
+@media (max-width: 480px) {
 
     #background {
-        width: 100%;
-        aspect-ratio: 3/4;
-        background: url('png/background.png') center/cover no-repeat;
-        border-radius: 20px;
         position: relative;
+        aspect-ratio: auto;
+        min-height: 75vh; /* фикс пустого экрана */
+        padding-top: 60px;
     }
-
-    #nastya {
-        width: 17%;
-        position: absolute;
-        top: 10px;
-        left: 50%;
-        transform: translateX(-50%);
-        opacity: 1;
-    }
-
-    #speechBox {
-        display: block;
-        position: absolute;
-        top: 25%;
-        left: 50%;
-        transform: translateX(-50%);
-        width: auto;
-        max-width: 80%;
-        background: #fff8c4;
-        padding: 10px 15px;
-        border-radius: 12px;
-        font-size: 16px;
-        box-sizing: border-box;
-    }
-
-    .game-btn {
-        position: absolute;
-        bottom: 15px;
-        left: 50%;
-        transform: translateX(-50%);
-        padding: 10px 20px;
-        font-size: 16px;
-        background: #ff69b4;
-        color: white;
-        border: none;
-        border-radius: 12px;
-        width: 60%;
-        max-width: 220px;
-    }
-
-    #gameArea, #gameArea2 {
-        position: absolute;
-        bottom: 10px;
-        width: 100%;
-    }
-
-    .slot {
-        width: 18vw;
-        height: 18vw;
-        max-width: 70px;
-        max-height: 70px;
-        border: 3px dashed #aaa;
-        border-radius: 15px;
-        display: inline-flex;
-        justify-content: center;
-        align-items: center;
-        margin: 6px;
-    }
-
-    .item-bottom {
-        width: 20vw;
-        max-width: 80px;
-        margin: 6px;
-        touch-action: none;
-        object-fit: contain;
-    }
-
-    .highlight {
-        outline: 3px solid #ff69b4;
-        border-radius: 10px;
-    }
-@media (max-width: 480px) {
 
     #nastya {
         width: 22%;
@@ -107,31 +107,21 @@
     }
 
     #speechBox {
-        position: relative; 
+        position: relative;
         top: auto;
         left: auto;
         transform: none;
-        margin: 8px auto;
+        margin: 10px auto;
         max-width: 92%;
         font-size: 14px;
-        z-index: 1;
     }
 
     #gameArea, #gameArea2 {
-        position: relative;      
+        position: relative;
         bottom: auto;
         margin-top: 10px;
+        width: 100%;
     }
-
-    #background {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: flex-start;
-        padding-top: 5px;
-
-        aspect-ratio: auto;
-        min-height: 70vh;
 
     .slot {
         width: 16vw;
@@ -141,18 +131,8 @@
     .item-bottom {
         width: 18vw;
     }
-}
 
-#speechBox {
-    max-height: 30%;
-    overflow-y: auto;
-}
-
-#nastya {
-    width: clamp(60px, 17%, 90px);
-}
-@media (max-width: 480px) {
-
+    /* экран 4 фикс */
     #screen4 img {
         width: 22% !important;
         top: 5px !important;
@@ -168,7 +148,17 @@
         font-size: 16px !important;
     }
 }
-    </style>
+
+/* мелкие улучшения */
+#speechBox {
+    max-height: 30%;
+    overflow-y: auto;
+}
+
+#nastya {
+    width: clamp(60px, 17%, 90px);
+}
+</style>
     </head>
     <body>
 
